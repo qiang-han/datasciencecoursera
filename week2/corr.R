@@ -1,12 +1,16 @@
 corr <- function(directory, threshold = 0) {
-    calcdata <- data.frame()
-    for (i in 1:length(id)) {
-        fname = sprintf('%03d.csv', id[i])
+    comp_tbl <- complete(directory)
+    cr <- c()
+    for (i in comp_tbl$id[comp_tbl['nobs'] > threshold]) {
+        fname = sprintf('%03d.csv', i)
         fpath = file.path(directory, fname)
         tmpdata <- read.csv(fpath, header=T, sep=',')
-        calcdata[i, 1] <- id[i]
-        calcdata[i, 2] <- sum(complete.cases(tmpdata))
+        sulfate <- tmpdata$sulfate[complete.cases(tmpdata)]
+        nitrate <- tmpdata$nitrate[complete.cases(tmpdata)]
+        tmpval <- cor(sulfate, nitrate)
+        if (!is.na(tmpval)) {
+            cr <- c(cr, tmpval)
+        }
     }
-    colnames(calcdata) <- c('id', 'nobs')
-    print(calcdata)
+    cr
 }
